@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Perfect Day — Build Yours</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FBF3E3;
+  --ivory:#FFFCF6;
+  --ink:#2B2013;
+  --ink-soft:#6b5c46;
+  --gold:#F3B341;
+  --peach:#F4A876;
+  --sunset:#E9613F;
+  --sky-blue:#8FC6E8;
+  --sky-deep:#3F7FB0;
+  --navy:#141B31;
+  --navy-deep:#0A0E1C;
+  --glass-light: rgba(255,252,246,0.55);
+  --glass-border: rgba(255,255,255,0.55);
+  --glass-dark: rgba(20,27,49,0.45);
+  --glass-dark-border: rgba(255,255,255,0.14);
+  --mood: 0;
+  --radius-lg: 28px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
+  --shadow-soft: 0 20px 60px -20px rgba(43,32,19,0.35);
+  --ease: cubic-bezier(.22,.9,.32,1);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Poppins',sans-serif;
+  color:var(--ink);
+  min-height:100vh;
+  overflow-x:hidden;
+  background:var(--navy-deep);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.serif{ font-family:'Playfair Display', serif; }
+button{ font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
+::selection{ background:var(--gold); color:var(--ink); }
+
+/* ============ SKY ENGINE ============ */
+#sky{
+  position:fixed; inset:0; z-index:0; overflow:hidden;
+  transition: filter 1.6s var(--ease);
+  filter: saturate(calc(1 + var(--mood) * 0.28)) brightness(calc(1 + var(--mood) * 0.06));
+}
+.sky-layer{
+  position:absolute; inset:-2% -2% -2% -2%;
+  opacity:0; transition: opacity 1.8s var(--ease);
+  will-change:opacity;
+}
+.sky-morning{ background:
+  radial-gradient(120% 70% at 18% 78%, rgba(255,224,150,0.9) 0%, rgba(255,224,150,0) 55%),
+  linear-gradient(180deg, #FBD9A7 0%, #F7C48B 22%, #F2A987 44%, #EE9A82 62%, #F6DDBB 100%); }
+.sky-afternoon{ background:
+  radial-gradient(90% 60% at 50% 8%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 60%),
+  linear-gradient(180deg, #4E9BD6 0%, #6FB4E4 30%, #9DCDEE 60%, #CFE7F5 100%); }
+.sky-evening{ background:
+  radial-gradient(110% 65% at 82% 62%, rgba(255,205,150,0.85) 0%, rgba(255,205,150,0) 55%),
+  linear-gradient(180deg, #3C3868 0%, #7A4B72 26%, #C15E6B 48%, #E8804F 68%, #F2A85F 100%); }
+.sky-night{ background:
+  radial-gradient(90% 60% at 25% 15%, rgba(120,150,220,0.25) 0%, rgba(120,150,220,0) 60%),
+  linear-gradient(180deg, #0A0E1E 0%, #101835 40%, #172248 75%, #1D2C55 100%); }
+body[data-stage="morning"] .sky-morning,
+body[data-stage="afternoon"] .sky-afternoon,
+body[data-stage="evening"] .sky-evening,
+body[data-stage="night"] .sky-night{ opacity:1; }
+
+#celestial{
+  position:absolute; width:120px; height:120px; border-radius:50%;
+  left:15%; top:78%; transform:translate(-50%,-50%);
+  transition: left 2.2s var(--ease), top 2.2s var(--ease), width 1.8s var(--ease), height 1.8s var(--ease), background 1.8s var(--ease), box-shadow 1.8s var(--ease), opacity 1.4s var(--ease);
+  opacity:0.95;
+}
+body[data-stage="morning"] #celestial{ left:20%; top:76%; width:110px; height:110px; background:radial-gradient(circle at 35% 35%, #FFF3D0, #F3B341 60%, #E98A3D 100%); box-shadow:0 0 90px 30px rgba(243,179,65,0.55), 0 0 200px 80px rgba(243,179,65,0.25); }
+body[data-stage="afternoon"] #celestial{ left:58%; top:16%; width:96px; height:96px; background:radial-gradient(circle at 35% 35%, #FFFDF0, #FFE9A8 55%, #FFD873 100%); box-shadow:0 0 110px 40px rgba(255,235,170,0.7), 0 0 240px 100px rgba(255,235,170,0.25); }
+body[data-stage="evening"] #celestial{ left:82%; top:62%; width:130px; height:130px; background:radial-gradient(circle at 35% 35%, #FFE3B0, #F4894C 55%, #D9522F 100%); box-shadow:0 0 110px 40px rgba(233,97,63,0.55), 0 0 220px 90px rgba(233,97,63,0.22); }
+body[data-stage="night"] #celestial{ left:78%; top:14%; width:64px; height:64px; background:radial-gradient(circle at 38% 35%, #FFFFFF, #E8ECF8 55%, #C7D0EA 100%); box-shadow:0 0 40px 12px rgba(230,235,255,0.45), 0 0 100px 40px rgba(150,170,230,0.18); opacity:0.92;}
+
+.clouds{ position:absolute; inset:0; overflow:hidden; }
+.cloud{
+  position:absolute; border-radius:50%;
+  background: var(--cloud-color, rgba(255,255,255,0.7));
+  filter:blur(2px);
+  opacity: var(--cloud-opacity, 0.8);
+  transition: opacity 1.6s var(--ease), background 1.6s var(--ease);
+}
+.cloud::before, .cloud::after{ content:''; position:absolute; border-radius:50%; background:inherit; }
+.c1{ width:180px; height:60px; top:18%; left:-20%; animation: drift 46s linear infinite; }
+.c1::before{ width:100px; height:80px; top:-35px; left:20px; }
+.c1::after{ width:90px; height:60px; top:-15px; left:100px; }
+.c2{ width:140px; height:46px; top:32%; left:-25%; animation: drift 62s linear infinite 8s; }
+.c2::before{ width:80px; height:60px; top:-28px; left:15px; }
+.c2::after{ width:70px; height:46px; top:-10px; left:80px; }
+.c3{ width:220px; height:70px; top:10%; left:-30%; animation: drift 80s linear infinite 20s; }
+.c3::before{ width:120px; height:95px; top:-40px; left:30px; }
+.c3::after{ width:100px; height:70px; top:-15px; left:130px; }
+@keyframes drift{ from{ transform:translateX(0); } to{ transform:translateX(140vw); } }
+body[data-stage="morning"] .cloud{ --cloud-color: rgba(255,238,214,0.85); --cloud-opacity:0.75; }
+body[data-stage="afternoon"] .cloud{ --cloud-color: rgba(255,255,255,0.92); --cloud-opacity:0.9; }
+body[data-stage="evening"] .cloud{ --cloud-color: rgba(255,214,196,0.7); --cloud-opacity:0.55; }
+body[data-stage="night"] .cloud{ --cloud-color: rgba(180,195,230,0.25); --cloud-opacity:0.25; }
+
+#fx-canvas{ position:absolute; inset:0; width:100%; height:100%; }
+
+.horizon-fade{
+  position:absolute; left:0; right:0; bottom:0; height:38vh; pointer-events:none;
+  background:linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(20,15,8,0.14) 100%);
+}
+body[data-stage="night"] .horizon-fade{ background:linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(2,4,14,0.55) 100%); }
+
+/* ============ LAYOUT SHELL ============ */
+#app{ position:relative; z-index:2; min-height:100vh; }
+.view{ display:none; min-height:100vh; }
+.view.active{ display:block; animation: viewIn .7s var(--ease); }
+@keyframes viewIn{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:translateY(0); } }
+
+/* ============ HERO ============ */
+#view-hero{ display:flex; align-items:center; justify-content:center; min-height:100vh; padding:6vh 6vw; }
+.hero-inner{ text-align:center; max-width:900px; }
+.hero-eyebrow{
+  font-size:.78rem; letter-spacing:.32em; text-transform:uppercase;
+  color:var(--ink); opacity:.72; font-weight:600; margin-bottom:22px;
+  display:inline-flex; align-items:center; gap:10px;
+}
+.hero-eyebrow::before,.hero-eyebrow::after{ content:''; width:28px; height:1px; background:currentColor; opacity:.6; }
+.hero-title{
+  font-size:clamp(2.3rem, 6.4vw, 5rem); line-height:1.06; font-weight:700;
+  color:#2B2013; text-shadow:0 2px 30px rgba(255,255,255,0.25);
+  letter-spacing:-.01em;
+}
+.hero-title em{ font-style:italic; color:#8A3B18; }
+.hero-sub{
+  margin-top:22px; font-size:clamp(1rem,1.6vw,1.25rem); font-weight:400;
+  color:#3d2f1c; opacity:.85; max-width:520px; margin-left:auto; margin-right:auto;
+}
+.cta-btn{
+  margin-top:48px; position:relative; display:inline-flex; align-items:center; gap:14px;
+  padding:20px 44px; border-radius:100px; font-size:1rem; font-weight:600; letter-spacing:.06em;
+  text-transform:uppercase; color:#2B1706; background:linear-gradient(135deg,#FFE29A,#F3B341 55%,#EA8A3D);
+  box-shadow:0 10px 40px -6px rgba(233,138,61,0.65), 0 0 0 1px rgba(255,255,255,0.4) inset;
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease);
+}
+.cta-btn:hover{ transform:translateY(-3px) scale(1.02); box-shadow:0 16px 50px -6px rgba(233,138,61,0.8), 0 0 0 1px rgba(255,255,255,0.5) inset; }
+.cta-btn:active{ transform:translateY(-1px) scale(.99); }
+.cta-btn .arrow{ transition:transform .3s var(--ease); }
+.cta-btn:hover .arrow{ transform:translateX(5px); }
+.hero-hint{ margin-top:20px; font-size:.82rem; color:#4a3a24; opacity:.6; letter-spacing:.03em; }
+
+/* ============ PROGRESS ============ */
+#progress{
+  position:fixed; top:26px; left:50%; transform:translateX(-50%); z-index:20;
+  display:flex; align-items:center; gap:0; padding:10px 22px; border-radius:100px;
+  background:var(--glass-light); border:1px solid var(--glass-border); backdrop-filter:blur(16px);
+  box-shadow:var(--shadow-soft); opacity:0; pointer-events:none; transition:opacity .5s var(--ease), background .6s ease, border-color .6s ease;
+}
+body[data-view="game"] #progress{ opacity:1; pointer-events:auto; }
+body[data-stage="night"] #progress{ background:var(--glass-dark); border-color:var(--glass-dark-border); color:#f2ecdd; }
+.p-step{ display:flex; align-items:center; gap:8px; padding:0 12px; font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; font-weight:600; opacity:.4; transition:opacity .4s ease, color .4s ease; white-space:nowrap; }
+.p-step .dot{ width:8px; height:8px; border-radius:50%; background:currentColor; opacity:.5; transition:all .4s ease; }
+.p-step.done{ opacity:.75; }
+.p-step.done .dot{ background:var(--gold); box-shadow:0 0 8px var(--gold); opacity:1; }
+.p-step.current{ opacity:1; }
+.p-step.current .dot{ background:var(--sunset); box-shadow:0 0 10px var(--sunset); transform:scale(1.3); opacity:1; }
+.p-line{ width:20px; height:1px; background:currentColor; opacity:.25; }
+
+/* ============ DASHBOARD ============ */
+#dashboard{
+  position:fixed; top:26px; right:26px; z-index:20; width:230px;
+  padding:18px 20px; border-radius:22px; background:var(--glass-light); border:1px solid var(--glass-border);
+  backdrop-filter:blur(18px); box-shadow:var(--shadow-soft); opacity:0; pointer-events:none;
+  transition:opacity .5s var(--ease), background .6s ease, border-color .6s ease, transform .5s var(--ease);
+  transform:translateX(12px);
+}
+body[data-view="game"] #dashboard{ opacity:1; pointer-events:auto; transform:translateX(0); }
+body[data-stage="night"] #dashboard{ background:var(--glass-dark); border-color:var(--glass-dark-border); color:#f2ecdd; }
+.dash-title{ font-size:.66rem; letter-spacing:.16em; text-transform:uppercase; font-weight:600; opacity:.55; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; }
+.dash-points{ font-weight:700; color:var(--sunset); }
+.stat-row{ display:flex; align-items:center; gap:8px; margin-bottom:9px; font-size:.78rem; }
+.stat-row:last-child{ margin-bottom:0; }
+.stat-icon{ width:18px; text-align:center; flex-shrink:0; }
+.stat-track{ flex:1; height:6px; border-radius:6px; background:rgba(120,100,70,0.18); overflow:hidden; position:relative; }
+body[data-stage="night"] .stat-track{ background:rgba(255,255,255,0.14); }
+.stat-fill{ height:100%; border-radius:6px; transition:width .8s var(--ease); }
+.stat-fill.happiness{ background:linear-gradient(90deg,#F3B341,#E9613F); }
+.stat-fill.energy{ background:linear-gradient(90deg,#F4D35E,#F3B341); }
+.stat-fill.fun{ background:linear-gradient(90deg,#F49AC2,#E9613F); }
+.stat-fill.calm{ background:linear-gradient(90deg,#8FC6E8,#5B9BD5); }
+.stat-fill.adventure{ background:linear-gradient(90deg,#F4A876,#C1442E); }
+.stat-val{ width:22px; text-align:right; font-weight:600; font-variant-numeric:tabular-nums; opacity:.75; }
+.stat-row.pulse .stat-track{ animation:pulseTrack .6s var(--ease); }
+@keyframes pulseTrack{ 0%{ box-shadow:0 0 0 0 rgba(243,179,65,0);} 30%{ box-shadow:0 0 0 4px rgba(243,179,65,0.35);} 100%{ box-shadow:0 0 0 0 rgba(243,179,65,0);} }
+
+/* ============ GAME VIEW ============ */
+#view-game{ display:flex; align-items:center; justify-content:center; min-height:100vh; padding:120px 6vw 60px; }
+.stage-panel{ width:100%; max-width:980px; text-align:center; }
+.stage-kicker{ font-size:.75rem; letter-spacing:.28em; text-transform:uppercase; font-weight:600; opacity:.6; margin-bottom:14px; }
+.stage-q{ font-size:clamp(1.6rem,3.6vw,2.6rem); font-weight:700; }
+.stage-poem{ font-family:'Playfair Display',serif; font-style:italic; font-size:clamp(1rem,1.5vw,1.15rem); opacity:.7; margin-top:10px; margin-bottom:44px; }
+body[data-stage="night"] .stage-kicker, body[data-stage="night"] .stage-q, body[data-stage="night"] .stage-poem{ color:#F5EFDD; }
+body[data-stage="evening"] .stage-kicker, body[data-stage="evening"] .stage-q, body[data-stage="evening"] .stage-poem{ color:#3A1F14; }
+
+.card-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+.a-card{
+  position:relative; border-radius:var(--radius-lg); padding:30px 20px 26px; text-align:left;
+  background:var(--glass-light); border:1px solid var(--glass-border); backdrop-filter:blur(14px);
+  box-shadow:0 14px 40px -18px rgba(43,32,19,0.4);
+  transition: transform .45s var(--ease), box-shadow .45s var(--ease), border-color .3s ease, background .5s ease;
+  overflow:hidden;
+}
+body[data-stage="night"] .a-card{ background:var(--glass-dark); border-color:var(--glass-dark-border); color:#F2ECDD; }
+.a-card::before{ content:''; position:absolute; inset:0; opacity:0; background:radial-gradient(120% 100% at 50% 0%, rgba(243,179,65,0.35), transparent 60%); transition:opacity .4s ease; }
+.a-card:hover{ transform:translateY(-8px); box-shadow:0 26px 60px -20px rgba(43,32,19,0.5); }
+.a-card:hover::before{ opacity:1; }
+.a-card:focus-visible{ outline:2px solid var(--sunset); outline-offset:3px; }
+.a-card .icon{ font-size:2.4rem; display:block; margin-bottom:16px; filter:drop-shadow(0 4px 10px rgba(0,0,0,0.15)); }
+.a-card .name{ font-family:'Playfair Display',serif; font-weight:600; font-size:1.15rem; margin-bottom:6px; }
+.a-card .tag{ font-size:.82rem; opacity:.68; line-height:1.4; }
+.a-card .cost{ position:absolute; top:18px; right:18px; font-size:.68rem; font-weight:600; opacity:.5; letter-spacing:.05em; }
+.a-card.selected{ border-color:var(--gold); box-shadow:0 0 0 2px var(--gold), 0 20px 50px -18px rgba(233,138,61,0.6); transform:translateY(-6px); }
+.a-card.selected::after{ content:'✓'; position:absolute; bottom:18px; right:20px; width:26px; height:26px; border-radius:50%; background:var(--gold); color:#2B1706; font-size:.8rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
+
+.stage-continue{ margin-top:42px; height:60px; display:flex; align-items:center; justify-content:center; }
+.continue-btn{
+  opacity:0; pointer-events:none; transform:translateY(8px);
+  transition:opacity .4s var(--ease), transform .4s var(--ease);
+  padding:16px 38px; border-radius:100px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; font-size:.85rem;
+  background:linear-gradient(135deg,#FFE29A,#F3B341,#EA8A3D); color:#2B1706;
+  box-shadow:0 10px 30px -8px rgba(233,138,61,0.6); display:inline-flex; align-items:center; gap:10px;
+}
+.continue-btn.show{ opacity:1; pointer-events:auto; transform:translateY(0); }
+.continue-btn:hover{ transform:translateY(-2px); }
+
+/* ============ RESULT ============ */
+#view-result{ display:flex; align-items:center; justify-content:center; min-height:100vh; padding:14vh 6vw 8vh; }
+.result-inner{ max-width:820px; width:100%; text-align:center; color:#F5EFDD; }
+.result-kicker{ font-size:.75rem; letter-spacing:.3em; text-transform:uppercase; opacity:.6; margin-bottom:14px; font-weight:600; }
+.result-title{ font-size:clamp(2rem,5vw,3.4rem); font-weight:700; margin-bottom:10px; }
+.score-ring-wrap{ margin:34px auto; width:190px; height:190px; position:relative; }
+.score-ring-wrap svg{ width:100%; height:100%; transform:rotate(-90deg); }
+.score-ring-bg{ fill:none; stroke:rgba(255,255,255,0.14); stroke-width:9; }
+.score-ring-fg{ fill:none; stroke:url(#ringGrad); stroke-width:9; stroke-linecap:round; stroke-dasharray:503; stroke-dashoffset:503; transition:stroke-dashoffset 1.6s var(--ease); }
+.score-center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.score-num{ font-family:'Playfair Display',serif; font-size:3rem; font-weight:700; line-height:1; }
+.score-of{ font-size:.75rem; opacity:.6; letter-spacing:.1em; margin-top:4px; }
+
+.persona-badge{ font-size:1.5rem; }
+.persona-title{ font-family:'Playfair Display',serif; font-weight:700; font-size:clamp(1.5rem,3vw,2.1rem); margin:10px 0 14px; color:#FFE29A; }
+.persona-desc{ max-width:520px; margin:0 auto; opacity:.82; line-height:1.7; font-size:.98rem; }
+
+.timeline{ margin-top:46px; display:grid; grid-template-columns:repeat(4,1fr); gap:16px; text-align:left; }
+.tl-item{ background:var(--glass-dark); border:1px solid var(--glass-dark-border); border-radius:18px; padding:18px 16px; backdrop-filter:blur(14px); }
+.tl-stage{ font-size:.64rem; letter-spacing:.16em; text-transform:uppercase; opacity:.55; font-weight:600; margin-bottom:8px; }
+.tl-icon{ font-size:1.5rem; display:block; margin-bottom:6px; }
+.tl-name{ font-family:'Playfair Display',serif; font-size:.98rem; font-weight:600; }
+
+.stat-recap{ margin-top:36px; display:flex; justify-content:center; gap:26px; flex-wrap:wrap; }
+.recap-item{ display:flex; flex-direction:column; align-items:center; gap:6px; font-size:.72rem; opacity:.85; }
+.recap-item .icon{ font-size:1.3rem; }
+.recap-item .val{ font-weight:700; font-family:'Playfair Display',serif; font-size:1.1rem; }
+
+.result-actions{ margin-top:48px; display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+.btn-primary, .btn-ghost{ padding:16px 34px; border-radius:100px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; font-size:.82rem; transition:transform .35s var(--ease), box-shadow .35s var(--ease), background .35s ease; }
+.btn-primary{ background:linear-gradient(135deg,#FFE29A,#F3B341,#EA8A3D); color:#2B1706; box-shadow:0 10px 30px -8px rgba(233,138,61,0.6); }
+.btn-primary:hover{ transform:translateY(-2px); }
+.btn-ghost{ border:1px solid rgba(255,255,255,0.35); color:#F5EFDD; background:rgba(255,255,255,0.06); }
+.btn-ghost:hover{ background:rgba(255,255,255,0.14); transform:translateY(-2px); }
+
+#toast{
+  position:fixed; bottom:32px; left:50%; transform:translateX(-50%) translateY(20px); z-index:100;
+  padding:14px 26px; border-radius:100px; background:rgba(20,27,49,0.92); color:#F5EFDD; font-size:.85rem;
+  opacity:0; pointer-events:none; transition:opacity .4s var(--ease), transform .4s var(--ease); box-shadow:0 10px 30px rgba(0,0,0,0.3);
+  display:flex; align-items:center; gap:8px;
+}
+#toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:900px){
+  .card-grid{ grid-template-columns:repeat(2,1fr); }
+  .timeline{ grid-template-columns:repeat(2,1fr); }
+  #dashboard{ width:180px; padding:14px 16px; }
+}
+@media (max-width:640px){
+  .card-grid{ grid-template-columns:1fr; gap:14px; }
+  #dashboard{ position:fixed; top:auto; bottom:14px; right:14px; left:14px; width:auto; display:flex; flex-wrap:wrap; gap:6px 14px; padding:12px 16px; }
+  .dash-title{ width:100%; }
+  .stat-row{ flex:1 1 44%; margin-bottom:2px; }
+  #progress{ top:14px; padding:8px 14px; max-width:92vw; overflow-x:auto; }
+  .p-step{ padding:0 7px; font-size:.6rem; }
+  .p-line{ width:10px; }
+  #view-game{ padding:150px 6vw 40px; }
+  .timeline{ grid-template-columns:1fr 1fr; }
+  .result-actions{ flex-direction:column; align-items:stretch; }
+}
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.2s !important; }
+}
+</style>
+</head>
+<body data-view="hero" data-stage="morning">
+
+<div id="sky" aria-hidden="true">
+  <div class="sky-layer sky-morning"></div>
+  <div class="sky-layer sky-afternoon"></div>
+  <div class="sky-layer sky-evening"></div>
+  <div class="sky-layer sky-night"></div>
+  <canvas id="fx-canvas"></canvas>
+  <div class="clouds">
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <div class="cloud c3"></div>
+  </div>
+  <div id="celestial"></div>
+  <div class="horizon-fade"></div>
+</div>
+
+<div id="progress">
+  <div class="p-step" data-p="morning"><span class="dot"></span>Morning</div>
+  <div class="p-line"></div>
+  <div class="p-step" data-p="afternoon"><span class="dot"></span>Afternoon</div>
+  <div class="p-line"></div>
+  <div class="p-step" data-p="evening"><span class="dot"></span>Evening</div>
+  <div class="p-line"></div>
+  <div class="p-step" data-p="night"><span class="dot"></span>Night</div>
+</div>
+
+<div id="dashboard">
+  <div class="dash-title"><span>Day Points</span><span class="dash-points" id="dashPoints">100</span></div>
+  <div class="stat-row" data-stat="happiness"><span class="stat-icon">❤️</span><div class="stat-track"><div class="stat-fill happiness" style="width:50%"></div></div><span class="stat-val">50</span></div>
+  <div class="stat-row" data-stat="energy"><span class="stat-icon">⚡</span><div class="stat-track"><div class="stat-fill energy" style="width:50%"></div></div><span class="stat-val">50</span></div>
+  <div class="stat-row" data-stat="fun"><span class="stat-icon">✨</span><div class="stat-track"><div class="stat-fill fun" style="width:50%"></div></div><span class="stat-val">50</span></div>
+  <div class="stat-row" data-stat="calm"><span class="stat-icon">🌿</span><div class="stat-track"><div class="stat-fill calm" style="width:50%"></div></div><span class="stat-val">50</span></div>
+  <div class="stat-row" data-stat="adventure"><span class="stat-icon">🔥</span><div class="stat-track"><div class="stat-fill adventure" style="width:50%"></div></div><span class="stat-val">50</span></div>
+</div>
+
+<div id="app">
+
+  <section id="view-hero" class="view active">
+    <div class="hero-inner">
+      <div class="hero-eyebrow">An interactive experience</div>
+      <h1 class="hero-title">WHAT DOES <em>YOUR</em><br>PERFECT DAY LOOK LIKE?</h1>
+      <p class="hero-sub">Not every perfect day looks the same. Build yours — one golden hour at a time.</p>
+      <button class="cta-btn" id="startBtn">Create My Perfect Day <span class="arrow">→</span></button>
+      <div class="hero-hint">Four stages · your choices · one score</div>
+    </div>
+  </section>
+
+  <section id="view-game" class="view">
+    <div class="stage-panel">
+      <div class="stage-kicker" id="stageKicker">Morning</div>
+      <h2 class="stage-q" id="stageQuestion">How does your day begin?</h2>
+      <p class="stage-poem" id="stagePoem">The world is quiet. This is where it begins.</p>
+      <div class="card-grid" id="cardGrid"></div>
+      <div class="stage-continue">
+        <button class="continue-btn" id="continueBtn">Continue <span class="arrow">→</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-result" class="view">
+    <div class="result-inner">
+      <div class="result-kicker">Your day is complete</div>
+      <h2 class="result-title">YOUR PERFECT DAY</h2>
+
+      <div class="score-ring-wrap">
+        <svg viewBox="0 0 180 180">
+          <defs>
+            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FFE29A"/>
+              <stop offset="55%" stop-color="#F3B341"/>
+              <stop offset="100%" stop-color="#E9613F"/>
+            </linearGradient>
+          </defs>
+          <circle class="score-ring-bg" cx="90" cy="90" r="80"></circle>
+          <circle class="score-ring-fg" id="scoreRing" cx="90" cy="90" r="80"></circle>
+        </svg>
+        <div class="score-center">
+          <div class="score-num" id="scoreNum">0</div>
+          <div class="score-of">OUT OF 100</div>
+        </div>
+      </div>
+
+      <div class="persona-badge" id="personaBadge">🌻</div>
+      <div class="persona-title" id="personaTitle">THE GOLDEN DAY</div>
+      <p class="persona-desc" id="personaDesc"></p>
+
+      <div class="timeline" id="timeline"></div>
+
+      <div class="stat-recap" id="statRecap"></div>
+
+      <div class="result-actions">
+        <button class="btn-primary" id="restartBtn">Create Another Day</button>
+        <button class="btn-ghost" id="shareBtn">Share My Perfect Day</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------------- DATA ---------------- */
+const STAGES = ["morning","afternoon","evening","night"];
+const STAGE_META = {
+  morning:   { label:"Morning",   question:"How does your day begin?",              poem:"The world is quiet. This is where it begins." },
+  afternoon: { label:"Afternoon", question:"The day is yours — where does it take you?", poem:"Sunlight, choices, momentum." },
+  evening:   { label:"Evening",   question:"As the light softens, what calls to you?", poem:"The sky softens. So do you." },
+  night:     { label:"Night",     question:"Before you close your eyes tonight —",    poem:"One more moment before the day rests." }
+};
+
+const CARDS = {
+  morning: [
+    { id:"cafe", icon:"☕", name:"Slow Café Morning", tag:"Warm cup, soft chair, no rush.", cost:25, fx:{happiness:8, energy:2, fun:2, calm:10, adventure:-2} },
+    { id:"sun-walk", icon:"🌻", name:"Walk in the Sunshine", tag:"Fresh air, golden light, open sky.", cost:25, fx:{happiness:6, energy:8, fun:4, calm:4, adventure:4} },
+    { id:"book", icon:"📖", name:"Read a Book", tag:"A quiet story, one page at a time.", cost:25, fx:{happiness:4, energy:-2, fun:2, calm:12, adventure:-4} },
+    { id:"music-rest", icon:"🎧", name:"Music & Relaxation", tag:"Favourite playlist, half-closed eyes.", cost:25, fx:{happiness:6, energy:4, fun:6, calm:8, adventure:-1} }
+  ],
+  afternoon: [
+    { id:"beach", icon:"🏖️", name:"Beach Adventure", tag:"Salt air, waves, bare feet in sand.", cost:25, fx:{happiness:8, energy:6, fun:10, calm:2, adventure:10} },
+    { id:"gaming", icon:"🎮", name:"Gaming", tag:"One more round. Then another.", cost:25, fx:{happiness:6, energy:-2, fun:10, calm:2, adventure:2} },
+    { id:"lunch-friends", icon:"🍕", name:"Lunch With Friends", tag:"Good food, better company.", cost:25, fx:{happiness:10, energy:4, fun:8, calm:4, adventure:2} },
+    { id:"city", icon:"🛍️", name:"Explore the City", tag:"New streets, unplanned turns.", cost:25, fx:{happiness:6, energy:4, fun:6, calm:-2, adventure:10} }
+  ],
+  evening: [
+    { id:"sunset", icon:"🌇", name:"Watch the Sunset", tag:"The sky performs its favourite trick.", cost:25, fx:{happiness:10, energy:-2, fun:2, calm:10, adventure:4} },
+    { id:"music-night", icon:"🎵", name:"Music Night", tag:"Live sound, moving bodies, bright lights.", cost:25, fx:{happiness:8, energy:6, fun:10, calm:2, adventure:6} },
+    { id:"movie", icon:"🍿", name:"Movie Night", tag:"Dim lights, warm blanket, good story.", cost:25, fx:{happiness:6, energy:-2, fun:8, calm:8, adventure:-2} },
+    { id:"walk-peace", icon:"🌳", name:"Peaceful Walk", tag:"Slow steps as the world cools down.", cost:25, fx:{happiness:6, energy:2, fun:2, calm:10, adventure:2} }
+  ],
+  night: [
+    { id:"stars", icon:"🌙", name:"Stargazing", tag:"Tiny lights, endless sky, quiet thoughts.", cost:25, fx:{happiness:8, energy:-4, fun:4, calm:12, adventure:6} },
+    { id:"reading", icon:"📖", name:"Reading", tag:"One last chapter before sleep.", cost:25, fx:{happiness:4, energy:-6, fun:2, calm:14, adventure:-4} },
+    { id:"late-music", icon:"🎧", name:"Late Night Music", tag:"Low volume, soft glow, half-awake.", cost:25, fx:{happiness:6, energy:-2, fun:8, calm:8, adventure:2} },
+    { id:"journal", icon:"✨", name:"Write About Your Day", tag:"Putting today into words.", cost:25, fx:{happiness:10, energy:-4, fun:2, calm:10, adventure:-2} }
+  ]
+};
+
+const PERSONAS = {
+  happiness: { badge:"🌻", title:"THE GOLDEN DAY", desc:"Your day glowed with warmth, connection and small, genuine joys. You didn't chase excitement — you let happiness find you, one gentle moment at a time." },
+  fun:       { badge:"🌊", title:"THE FREE SPIRIT", desc:"You followed what felt good and let the day surprise you. Playful, spontaneous, unbothered by plans — your perfect day had rhythm, not routine." },
+  calm:      { badge:"☁️", title:"THE PEACE SEEKER", desc:"You chose quiet over noise, stillness over rush. Your perfect day wasn't about doing more — it was about finally feeling settled." },
+  adventure: { badge:"🔥", title:"THE ADVENTURER", desc:"You reached for the unfamiliar and said yes to more. Your perfect day had momentum — new places, new sensations, a pulse that never quite slowed." },
+  dreamer:   { badge:"🌙", title:"THE DREAMER", desc:"Your day drifted toward reflection — stars, stories, quiet thoughts before sleep. You didn't need a loud day to feel a full one." }
+};
+
+/* ---------------- STATE ---------------- */
+const state = {
+  stats:{ happiness:50, energy:50, fun:50, calm:50, adventure:50 },
+  points:100,
+  choices:{},
+  stageIndex:0,
+  mood:0,
+  moodTarget:0
+};
+
+/* ---------------- DOM REFS ---------------- */
+const body = document.body;
+const cardGrid = document.getElementById('cardGrid');
+const continueBtn = document.getElementById('continueBtn');
+const stageKicker = document.getElementById('stageKicker');
+const stageQuestion = document.getElementById('stageQuestion');
+const stagePoem = document.getElementById('stagePoem');
+const dashPoints = document.getElementById('dashPoints');
+
+/* ---------------- VIEW SWITCH ---------------- */
+function setView(v){ body.dataset.view = v; }
+function setStage(s){ body.dataset.stage = s; }
+
+document.getElementById('startBtn').addEventListener('click', () => {
+  setView('game');
+  renderStage();
+});
+
+document.getElementById('restartBtn').addEventListener('click', () => {
+  state.stats = { happiness:50, energy:50, fun:50, calm:50, adventure:50 };
+  state.points = 100;
+  state.choices = {};
+  state.stageIndex = 0;
+  state.mood = 0; state.moodTarget = 0;
+  updateDashboard(false);
+  setStage('morning');
+  setView('hero');
+});
+
+document.getElementById('shareBtn').addEventListener('click', shareDay);
+
+/* ---------------- STAGE RENDER ---------------- */
+function renderStage(){
+  const stage = STAGES[state.stageIndex];
+  setStage(stage);
+  const meta = STAGE_META[stage];
+  stageKicker.textContent = meta.label;
+  stageQuestion.textContent = meta.question;
+  stagePoem.textContent = meta.poem;
+  updateProgress(stage);
+
+  cardGrid.innerHTML = '';
+  CARDS[stage].forEach(card => {
+    const el = document.createElement('button');
+    el.className = 'a-card';
+    el.type = 'button';
+    el.setAttribute('aria-pressed','false');
+    el.innerHTML =
+      '<span class="cost">' + card.cost + ' pts</span>' +
+      '<span class="icon">' + card.icon + '</span>' +
+      '<div class="name">' + card.name + '</div>' +
+      '<div class="tag">' + card.tag + '</div>';
+    el.addEventListener('click', () => selectCard(stage, card, el));
+    cardGrid.appendChild(el);
+  });
+
+  continueBtn.classList.remove('show');
+  continueBtn.onclick = null;
+}
+
+function updateProgress(stage){
+  document.querySelectorAll('.p-step').forEach(step => {
+    const s = step.dataset.p;
+    step.classList.remove('done','current');
+    if (s === stage) step.classList.add('current');
+    else if (STAGES.indexOf(s) < STAGES.indexOf(stage)) step.classList.add('done');
+  });
+}
+
+function selectCard(stage, card, el){
+  // if a different card in this stage was previously selected this session, revert its stat effect first
+  const prev = state.choices[stage];
+  if (prev && prev.id === card.id) return; // already selected
+
+  if (prev) {
+    Object.keys(prev.fx).forEach(k => { state.stats[k] -= prev.fx[k]; });
+    state.points += prev.cost;
+  }
+
+  Object.keys(card.fx).forEach(k => {
+    state.stats[k] = clamp(state.stats[k] + card.fx[k], 0, 100);
+  });
+  state.points = Math.max(0, state.points - card.cost);
+  state.choices[stage] = card;
+
+  cardGrid.querySelectorAll('.a-card').forEach(c => { c.classList.remove('selected'); c.setAttribute('aria-pressed','false'); });
+  el.classList.add('selected');
+  el.setAttribute('aria-pressed','true');
+
+  // mood target from this choice
+  state.moodTarget = clamp((card.fx.adventure - card.fx.calm) / 12, -1, 1);
+
+  updateDashboard(true);
+
+  continueBtn.classList.add('show');
+  continueBtn.onclick = () => advanceStage();
+}
+
+function advanceStage(){
+  if (state.stageIndex < STAGES.length - 1){
+    state.stageIndex++;
+    renderStage();
+    window.scrollTo({top:0, behavior:'smooth'});
+  } else {
+    showResult();
+  }
+}
+
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+
+/* ---------------- DASHBOARD ---------------- */
+function updateDashboard(pulse){
+  Object.keys(state.stats).forEach(key => {
+    const row = document.querySelector('.stat-row[data-stat="' + key + '"]');
+    if (!row) return;
+    const val = Math.round(state.stats[key]);
+    row.querySelector('.stat-fill').style.width = val + '%';
+    row.querySelector('.stat-val').textContent = val;
+    if (pulse){
+      row.classList.remove('pulse');
+      void row.offsetWidth;
+      row.classList.add('pulse');
+    }
+  });
+  dashPoints.textContent = state.points;
+}
+
+/* ---------------- RESULT ---------------- */
+function showResult(){
+  setView('result');
+
+  const avg = (state.stats.happiness + state.stats.energy + state.stats.fun + state.stats.calm + state.stats.adventure) / 5;
+  const score = Math.round(clamp(avg, 0, 100));
+
+  // determine persona
+  const candidates = { happiness:state.stats.happiness, fun:state.stats.fun, calm:state.stats.calm, adventure:state.stats.adventure };
+  let dominant = Object.keys(candidates).reduce((a,b) => candidates[a] >= candidates[b] ? a : b);
+
+  // dreamer override: low energy + reflective night choice + calm outweighing adventure
+  const nightChoice = state.choices.night;
+  const reflective = nightChoice && (nightChoice.id === 'stars' || nightChoice.id === 'reading' || nightChoice.id === 'journal');
+  if (reflective && state.stats.energy < 46 && state.stats.calm > state.stats.adventure && state.stats.calm >= candidates[dominant] - 6) {
+    dominant = 'dreamer';
+  }
+
+  const persona = PERSONAS[dominant];
+  document.getElementById('personaBadge').textContent = persona.badge;
+  document.getElementById('personaTitle').textContent = persona.title;
+  document.getElementById('personaDesc').textContent = persona.desc;
+
+  // score ring + count-up
+  const ring = document.getElementById('scoreRing');
+  const circumference = 2 * Math.PI * 80;
+  requestAnimationFrame(() => {
+    ring.style.strokeDashoffset = circumference - (circumference * score / 100);
+  });
+  animateNumber(document.getElementById('scoreNum'), score);
+
+  // timeline
+  const timeline = document.getElementById('timeline');
+  timeline.innerHTML = '';
+  STAGES.forEach(stage => {
+    const c = state.choices[stage];
+    const div = document.createElement('div');
+    div.className = 'tl-item';
+    div.innerHTML =
+      '<div class="tl-stage">' + STAGE_META[stage].label + '</div>' +
+      '<span class="tl-icon">' + (c ? c.icon : '—') + '</span>' +
+      '<div class="tl-name">' + (c ? c.name : 'Skipped') + '</div>';
+    timeline.appendChild(div);
+  });
+
+  // stat recap
+  const recap = document.getElementById('statRecap');
+  const icons = { happiness:'❤️', energy:'⚡', fun:'✨', calm:'🌿', adventure:'🔥' };
+  recap.innerHTML = '';
+  Object.keys(state.stats).forEach(k => {
+    const item = document.createElement('div');
+    item.className = 'recap-item';
+    item.innerHTML = '<span class="icon">' + icons[k] + '</span><span class="val">' + Math.round(state.stats[k]) + '</span><span>' + k.charAt(0).toUpperCase()+k.slice(1) + '</span>';
+    recap.appendChild(item);
+  });
+
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function animateNumber(el, target){
+  const start = 0; const duration = 1400; const t0 = performance.now();
+  function step(t){
+    const p = clamp((t - t0) / duration, 0, 1);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(start + (target - start) * eased);
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function shareDay(){
+  const score = document.getElementById('scoreNum').textContent;
+  const persona = document.getElementById('personaTitle').textContent;
+  const lines = STAGES.map(s => STAGE_META[s].label + ': ' + (state.choices[s] ? state.choices[s].name : '—'));
+  const text = "My Perfect Day Score: " + score + "/100 — " + persona + "\n" + lines.join('\n') + "\n\nBuild yours ✨";
+  const showToast = (msg) => {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 2600);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(() => showToast('Copied ✨ Share your perfect day.')).catch(() => showToast(text));
+  } else {
+    showToast('Your perfect day, ready to share ✨');
+  }
+}
+
+/* ---------------- SKY FX (canvas: stars + particles) ---------------- */
+const canvas = document.getElementById('fx-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, DPR;
+function resize(){
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = W * DPR; canvas.height = H * DPR;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+window.addEventListener('resize', resize);
+resize();
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// stars
+const STAR_COUNT = 90;
+const stars = [];
+for (let i=0;i<STAR_COUNT;i++){
+  stars.push({
+    x: Math.random()*W, y: Math.random()*H*0.75,
+    r: Math.random()*1.4 + 0.4,
+    phase: Math.random()*Math.PI*2,
+    speed: Math.random()*0.02 + 0.008,
+    alpha: 0
+  });
+}
+
+// particles (motes)
+const PARTICLE_COUNT = 42;
+const particles = [];
+for (let i=0;i<PARTICLE_COUNT;i++){
+  particles.push({
+    x: Math.random()*W, y: Math.random()*H,
+    r: Math.random()*2 + 0.8,
+    vy: -(Math.random()*0.25 + 0.08),
+    vx: (Math.random()-0.5) * 0.15,
+    drift: Math.random()*Math.PI*2,
+    alpha: Math.random()*0.5 + 0.2
+  });
+}
+
+const STAGE_PARTICLE_COLOR = {
+  morning: '255,214,140',
+  afternoon: '255,255,255',
+  evening: '255,190,150',
+  night: '210,220,255'
+};
+
+function currentStage(){ return body.dataset.stage; }
+
+function lerp(a,b,t){ return a + (b-a)*t; }
+
+function tick(){
+  ctx.clearRect(0,0,W,H);
+  const stage = currentStage();
+
+  // mood smoothing
+  state.mood = lerp(state.mood, state.moodTarget, 0.02);
+  document.documentElement.style.setProperty('--mood', state.mood.toFixed(3));
+
+  // stars
+  const starTarget = stage === 'night' ? 1 : 0;
+  stars.forEach(s => {
+    s.alpha = lerp(s.alpha, starTarget, 0.03);
+    if (s.alpha > 0.01){
+      const tw = 0.55 + Math.sin(performance.now()*s.speed + s.phase) * 0.45;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(255,255,255,' + (s.alpha * tw).toFixed(3) + ')';
+      ctx.fill();
+    }
+  });
+
+  // particles
+  const speedMul = reduceMotion ? 0.15 : (1 + state.mood * 0.8);
+  const color = STAGE_PARTICLE_COLOR[stage] || '255,255,255';
+  particles.forEach(p => {
+    p.y += p.vy * speedMul;
+    p.x += p.vx * speedMul + Math.sin(p.drift + performance.now()*0.0004) * 0.12;
+    if (p.y < -10){ p.y = H + 10; p.x = Math.random()*W; }
+    if (p.x < -10) p.x = W + 10;
+    if (p.x > W + 10) p.x = -10;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r + Math.max(0,state.mood)*0.6, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(' + color + ',' + p.alpha.toFixed(3) + ')';
+    ctx.fill();
+  });
+
+  if (!reduceMotion) requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+if (reduceMotion){ setInterval(tick, 700); }
+
+/* ---------------- INIT ---------------- */
+updateDashboard(false);
+})();
+</script>
+</body>
+</html>
